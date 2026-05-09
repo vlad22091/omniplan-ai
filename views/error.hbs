@@ -1,0 +1,10 @@
+<div style="background-color: #ffe6e6; padding: 20px; border: 1px solid #ff0000; border-radius: 5px;">
+  <h1 style="color: red;">Помилка: {{message}}</h1>
+  <h2>Статус: {{error.status}}</h2>
+  
+  {{#if error.stack}}
+    <pre style="background: #fff; padding: 10px; overflow-x: auto;">
+      {{error.stack}}
+    </pre>
+  {{/if}}
+</div>

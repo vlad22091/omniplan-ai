@@ -1,0 +1,66 @@
+<h2>Збережені плани</h2>
+
+{{#if plans.length}}
+  <div style="display: flex; flex-direction: column; gap: 20px;">
+    {{#each plans}}
+      <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; background: #f9f9f9;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3>{{this.title}} <span style="font-size: 14px; color: #666;">({{this.category}})</span></h3>
+          
+          <!-- Випадаючий список статусів -->
+          <div>
+            <label for="status-{{this.id}}" style="font-size: 14px; font-weight: bold;">Статус:</label>
+            <select class="status-select" data-id="{{this.id}}" style="padding: 5px; border-radius: 4px;">
+              <option value="Планування" {{#if (eq this.status 'Планування')}}selected{{/if}}>📝 Планування</option>
+              <option value="Реалізація" {{#if (eq this.status 'Реалізація')}}selected{{/if}}>⚙️ Реалізація</option>
+              <option value="Завершено" {{#if (eq this.status 'Завершено')}}selected{{/if}}>✅ Завершено</option>
+            </select>
+          </div>
+        </div>
+
+        <p><strong>Ваш запит:</strong> {{this.user_prompt}}</p>
+        <hr>
+        <div style="white-space: pre-wrap;">
+          {{this.generated_content}}
+        </div>
+        <p style="font-size: 12px; color: #999; margin-top: 10px;">Створено: {{this.created_at}}</p>
+      </div>
+    {{/each}}
+  </div>
+{{else}}
+  <p>Ви ще не згенерували жодного плану. <a href="/generate">Створити перший?</a></p>
+{{/if}}
+
+<!-- Скрипт для відправки нового статусу на сервер без перезавантаження сторінки -->
+<script>
+  document.querySelectorAll('.status-select').forEach(select => {
+    select.addEventListener('change', async (event) => {
+      const planId = event.target.getAttribute('data-id');
+      const newStatus = event.target.value;
+
+      try {
+        const response = await fetch('/update-status', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ id: planId, status: newStatus })
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+          // Можна додати візуальний фідбек, наприклад, змінити колір рамки
+          event.target.style.border = '2px solid #28a745';
+          setTimeout(() => event.target.style.border = '1px solid #ccc', 1000);
+        } else {
+          alert('Не вдалося оновити статус');
+        }
+      } catch (error) {
+        console.error('Помилка мережі:', error);
+        alert('Помилка з\'єднання з сервером');
+      }
+    });
+  });
+</script>
