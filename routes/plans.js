@@ -90,4 +90,16 @@ router.post('/update-status', async (req, res) => {
   }
 });
 
+router.post('/delete', async (req, res) => {
+  const { id } = req.body;
+  
+  try {
+    await db.query('DELETE FROM plans WHERE id = $1', [id]);
+    res.json({ success: true, message: "План видалено" });
+  } catch (err) {
+    console.error("Помилка видалення:", err);
+    res.status(500).json({ success: false, error: "Помилка бази даних" });
+  }
+});
+
 export default router;

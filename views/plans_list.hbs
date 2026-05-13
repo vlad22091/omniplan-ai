@@ -1,14 +1,15 @@
 <h2>Збережені плани</h2>
+<h2>Збережені плани</h2>
 
 {{#if plans.length}}
   <div style="display: flex; flex-direction: column; gap: 20px;">
     {{#each plans}}
-      <div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; background: #f9f9f9;">
+      <!-- Додали клас "plan-card" сюди -->
+      <div class="plan-card" style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; background: #f9f9f9;">
         
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <h3>{{this.title}} <span style="font-size: 14px; color: #666;">({{this.category}})</span></h3>
           
-          <!-- Випадаючий список статусів -->
           <div>
             <label for="status-{{this.id}}" style="font-size: 14px; font-weight: bold;">Статус:</label>
             <select class="status-select" data-id="{{this.id}}" style="padding: 5px; border-radius: 4px;">
@@ -24,7 +25,31 @@
         <div style="white-space: pre-wrap;">
           {{this.generated_content}}
         </div>
-        <p style="font-size: 12px; color: #999; margin-top: 10px;">Створено: {{this.created_at}}</p>
+        
+        <!-- НОВИЙ БЛОК З КНОПКАМИ -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+          <p style="font-size: 12px; color: #999; margin: 0;">Створено: {{this.created_at}}</p>
+          
+          <div style="display: flex; gap: 10px;">
+            <!-- Кнопка Видалити -->
+            <button class="delete-btn" data-id="{{this.id}}" style="padding: 8px 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+               Видалити
+            </button>
+
+            <!-- Прихована форма для Перестворення -->
+            <form action="/generate" method="POST" style="margin: 0;">
+              <!-- Handlebars автоматично безпечно підставляє ці дані -->
+              <input type="hidden" name="title" value="{{this.title}}">
+              <input type="hidden" name="category" value="{{this.category}}">
+              <input type="hidden" name="user_prompt" value="{{this.user_prompt}}">
+              <button type="submit" style="padding: 8px 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                 Перестворити
+              </button>
+            </form>
+          </div>
+        </div>
+        <!-- КІНЕЦЬ НОВОГО БЛОКУ -->
+
       </div>
     {{/each}}
   </div>
@@ -32,7 +57,6 @@
   <p>Ви ще не згенерували жодного плану. <a href="/generate">Створити перший?</a></p>
 {{/if}}
 
-<!-- Скрипт для відправки нового статусу на сервер без перезавантаження сторінки -->
 <script>
   document.querySelectorAll('.status-select').forEach(select => {
     select.addEventListener('change', async (event) => {
@@ -42,24 +66,43 @@
       try {
         const response = await fetch('/update-status', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: planId, status: newStatus })
         });
-
         const result = await response.json();
-        
         if (result.success) {
-          // Можна додати візуальний фідбек, наприклад, змінити колір рамки
           event.target.style.border = '2px solid #28a745';
           setTimeout(() => event.target.style.border = '1px solid #ccc', 1000);
-        } else {
-          alert('Не вдалося оновити статус');
         }
       } catch (error) {
-        console.error('Помилка мережі:', error);
-        alert('Помилка з\'єднання з сервером');
+        console.error('Помилка:', error);
+      }
+    });
+  });
+
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', async (event) => {
+      const planId = event.target.getAttribute('data-id');
+
+      if (confirm('Ви впевнені, що хочете назавжди видалити цей план?')) {
+        try {
+          const response = await fetch('/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: planId })
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            event.target.closest('.plan-card').remove();
+          } else {
+            alert('Не вдалося видалити план з бази даних.');
+          }
+        } catch (error) {
+          console.error('Помилка мережі:', error);
+          alert('Помилка з\'єднання з сервером');
+        }
       }
     });
   });

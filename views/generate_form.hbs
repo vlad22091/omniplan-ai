@@ -5,14 +5,19 @@
   <label for="title">Назва плану:</label>
   <input type="text" id="title" name="title" placeholder="Напр.: План тренувань на тиждень" required>
 
-  <label for="category">Категорія:</label>
-  <select id="category" name="category">
-    <option value="Спорт">Спорт / Фітнес</option>
-    <option value="Будівництво">Будівництво / Ремонт</option>
-    <option value="Навчання">Навчання / IT</option>
-    <option value="Інше">Інше</option>
+<label for="category">Категорія:</label>
+  <select id="category" name="category" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+    <option value="Спорт">🏋️ Спорт / Фітнес</option>
+    <option value="Будівництво">🏗 Будівництво / Ремонт</option>
+    <option value="Навчання">📚 Навчання / IT</option>
+    <option value="Робота">💼 Робота / Бізнес-проєкт</option>
+    <option value="Особистий розвиток">🌱 Особистий розвиток / Звички</option>
+    <option value="Подорожі">✈️ Подорожі / Маршрути</option>
+    <option value="Фінанси">💰 Фінансове планування</option>
+    <option value="Творчість">🎨 Творчість / Хобі</option>
+    <option value="Побут">🏠 Побут / Рутина</option>
+    <option value="Інше">📌 Інше</option>
   </select>
-
   <label for="user_prompt">Деталі (що врахувати?):</label>
   <textarea id="user_prompt" name="user_prompt" rows="5" placeholder="Напр.: 3 тренування на тиждень, акцент на баланс БЖУ для схуднення, без кардіо..." required></textarea>
 
